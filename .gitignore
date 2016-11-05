@@ -92,3 +92,5 @@ ENV/
 data/
 *.log
 .idea/
+cookies.txt
+libs/
