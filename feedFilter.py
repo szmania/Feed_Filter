@@ -36,9 +36,12 @@ from requests import session
 # ruTrackerRSS_NFL_filters = ['Seahawks','Chargers']
 # self.deluge_download_torrent_folder = 'G:\\temp\Deluge_Torrents'
 LOGFILE_feedFilter = 'feedFilter_log.log'
-FILTERS_FILE = 'data\\filters.cfg'
+FILTERS_FILE = 'data\\filters.ini'
+ACCOUNTS_FILE = 'data\\accounts.ini'
+TORRENT_CLIENTS_FILE = 'data\\torrentClients.ini'
 
 
+MEGATOOLS_EXEs = ['megacopy', 'megadf', 'megadl', 'megaget', 'megals', 'megamkdir', 'megaput', 'megareg', 'megarm']
 
 class feedFilter_Xenforo(Xenforo):
     def __init__(self, username, password, site, proxy=None):
@@ -377,7 +380,7 @@ class MainWindow(QMainWindow):
 
     def megaTools_selectDir(self):
         self.mmMegaToolsTxt.setText(QFileDialog.getExistingDirectory(options=QFileDialog.ShowDirsOnly))
-        for item in megaToolsEXEs:
+        for item in MEGATOOLS_EXEs:
             if not os.path.isfile(self.mmMegaToolsTxt.text()+ '\%s.exe' % item):
                 QMessageBox.warning(self, 'MegaTools executable not found!', '"%s" not found!' % item)
 
@@ -427,9 +430,7 @@ class MainWindow(QMainWindow):
                 filtersFile.write('type='+dict['type']+'\n')
                 filtersFile.write('enabled='+dict['enabled']+'\n')
 
-
-
-                if dateTime:
+                if dateTime and dict['enabled'] == 'True':
                     filtersFile.write('lastChecked='+ str(dateTime) +'\n')
                 else: 
                     filtersFile.write('lastChecked='+ dict['lastChecked'] +'\n')
@@ -490,10 +491,17 @@ class feedFilter(MainWindow):
             setattr(self, key, value)
 
 
+        logging.debug('')
+        logging.debug('')
+
+
         self._setUp()
 
 
     def _setUp(self):
+
+        logging.debug(' Setting up feedFilter.')
+
 
         self.getTorrentClientsInfo()
 
@@ -532,7 +540,8 @@ class feedFilter(MainWindow):
 
     def getTorrentClientsInfo(self):
         logging.debug(' Getting torrent client info from torrentClients.cfg file.')
-        with open('data\\torrentClients.cfg', 'r') as cfg:
+
+        with open(TORRENT_CLIENTS_FILE, 'r') as cfg:
             lines = cfg.readlines()
 
         for i in range(len(lines)):
@@ -549,7 +558,9 @@ class feedFilter(MainWindow):
 
     def getLoginInfo(self):
         logging.debug(' Getting accounts info from accounts.cfg file.')
-        with open('data\\accounts.cfg', 'r') as cfg:
+
+        with open(ACCOUNTS_FILE, 'r') as cfg:
+
             lines = cfg.readlines()
 
         for i in range(len(lines)):
@@ -578,7 +589,8 @@ class feedFilter(MainWindow):
 
 
     def _processFilter(self, dict):
-        logging.debug(' Processing filters.')
+        logging.debug('')
+        logging.debug(' Processing filter: %s' % (dict['name']))
         feedData = self._getFeedData(dict['url'])
 
 
@@ -590,7 +602,9 @@ class feedFilter(MainWindow):
         # dict['feedData'] = feedData
         if dict['enabled'] == 'True':
             posts = self._filterFeed(feedData, dict['lastChecked'], dict['contains'], dict['excludes'])
-            logging.debug(' %d post(s) found for "%s"' % (len(posts), dict['url']))
+            if len(posts) > 0:
+                logging.debug(' POSTS FOUND!')
+            logging.debug(' %d post(s) found for "%s" - "%s"' % (len(posts), dict['name'], dict['url']))
 
             for i in range(len(posts)):
 
@@ -687,7 +701,7 @@ class feedFilter(MainWindow):
                 foundIncludes = True
                 for termContain in termsContains:
                     termContain = termContain.lstrip(' ').rstrip(' ')
-                    if not termContain in data.entries[i].title:
+                    if not termContain in data.entries[i].title and not termContain.lower() in data.entries[i].title:
                         # logging.debug(' Did not find one term that it must contain "%s" in url: "%s"!' % (termContain, data.entries[i].title))
                         foundIncludes = False
 
@@ -723,7 +737,8 @@ class feedFilter(MainWindow):
 
 
     def _downloadTorrent_ruTracker(self, topicID, downloadTorrentDir):
-        logging.debug('    Download torrent file from ruTracker.')
+        logging.debug('    Downloading torrent file from ruTracker to "%s".' % downloadTorrentDir)
+        logging.debug('    Using arguments: ' + ' -t ' + topicID + ' -u ' + self.ruTracker_username + ' -p ' + self.ruTracker_password + ' -o ' + downloadTorrentDir)
 
         # if self.silent:
         CREATE_NO_WINDOW = 0x08000000
