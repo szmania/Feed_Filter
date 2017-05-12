@@ -36,12 +36,20 @@ from requests import session
 # ruTrackerRSS_NFL_filters = ['Seahawks','Chargers']
 # self.deluge_download_torrent_folder = 'G:\\temp\Deluge_Torrents'
 LOGFILE_feedFilter = 'feedFilter_log.log'
+<<<<<<< HEAD
 FILTERS_FILE = 'data\\filters.ini'
 ACCOUNTS_FILE = 'data\\accounts.ini'
 TORRENT_CLIENTS_FILE = 'data\\torrentClients.ini'
 
 
 MEGATOOLS_EXEs = ['megacopy', 'megadf', 'megadl', 'megaget', 'megals', 'megamkdir', 'megaput', 'megareg', 'megarm']
+=======
+FILTERS_FILE = 'data\\filters.cfg'
+ACCOUNTS_FILE = 'data\\accounts.cfg'
+TORRENT_CLIENTS_FILE = 'data\\torrentClients.cfg'
+
+
+>>>>>>> bf2c50308a27f3ed8a686dcc212507baf462fabb
 
 class feedFilter_Xenforo(Xenforo):
     def __init__(self, username, password, site, proxy=None):
@@ -380,7 +388,11 @@ class MainWindow(QMainWindow):
 
     def megaTools_selectDir(self):
         self.mmMegaToolsTxt.setText(QFileDialog.getExistingDirectory(options=QFileDialog.ShowDirsOnly))
+<<<<<<< HEAD
         for item in MEGATOOLS_EXEs:
+=======
+        for item in megaToolsEXEs:
+>>>>>>> bf2c50308a27f3ed8a686dcc212507baf462fabb
             if not os.path.isfile(self.mmMegaToolsTxt.text()+ '\%s.exe' % item):
                 QMessageBox.warning(self, 'MegaTools executable not found!', '"%s" not found!' % item)
 
@@ -430,7 +442,13 @@ class MainWindow(QMainWindow):
                 filtersFile.write('type='+dict['type']+'\n')
                 filtersFile.write('enabled='+dict['enabled']+'\n')
 
+<<<<<<< HEAD
                 if dateTime and dict['enabled'] == 'True':
+=======
+
+
+                if dateTime:
+>>>>>>> bf2c50308a27f3ed8a686dcc212507baf462fabb
                     filtersFile.write('lastChecked='+ str(dateTime) +'\n')
                 else: 
                     filtersFile.write('lastChecked='+ dict['lastChecked'] +'\n')
@@ -589,8 +607,12 @@ class feedFilter(MainWindow):
 
 
     def _processFilter(self, dict):
+<<<<<<< HEAD
         logging.debug('')
         logging.debug(' Processing filter: %s' % (dict['name']))
+=======
+        logging.debug(' Processing filters.')
+>>>>>>> bf2c50308a27f3ed8a686dcc212507baf462fabb
         feedData = self._getFeedData(dict['url'])
 
 
@@ -602,9 +624,13 @@ class feedFilter(MainWindow):
         # dict['feedData'] = feedData
         if dict['enabled'] == 'True':
             posts = self._filterFeed(feedData, dict['lastChecked'], dict['contains'], dict['excludes'])
+<<<<<<< HEAD
             if len(posts) > 0:
                 logging.debug(' POSTS FOUND!')
             logging.debug(' %d post(s) found for "%s" - "%s"' % (len(posts), dict['name'], dict['url']))
+=======
+            logging.debug(' %d post(s) found for "%s"' % (len(posts), dict['url']))
+>>>>>>> bf2c50308a27f3ed8a686dcc212507baf462fabb
 
             for i in range(len(posts)):
 
@@ -701,7 +727,11 @@ class feedFilter(MainWindow):
                 foundIncludes = True
                 for termContain in termsContains:
                     termContain = termContain.lstrip(' ').rstrip(' ')
+<<<<<<< HEAD
                     if not termContain in data.entries[i].title and not termContain.lower() in data.entries[i].title:
+=======
+                    if not termContain in data.entries[i].title:
+>>>>>>> bf2c50308a27f3ed8a686dcc212507baf462fabb
                         # logging.debug(' Did not find one term that it must contain "%s" in url: "%s"!' % (termContain, data.entries[i].title))
                         foundIncludes = False
 
@@ -737,8 +767,12 @@ class feedFilter(MainWindow):
 
 
     def _downloadTorrent_ruTracker(self, topicID, downloadTorrentDir):
+<<<<<<< HEAD
         logging.debug('    Downloading torrent file from ruTracker to "%s".' % downloadTorrentDir)
         logging.debug('    Using arguments: ' + ' -t ' + topicID + ' -u ' + self.ruTracker_username + ' -p ' + self.ruTracker_password + ' -o ' + downloadTorrentDir)
+=======
+        logging.debug('    Download torrent file from ruTracker.')
+>>>>>>> bf2c50308a27f3ed8a686dcc212507baf462fabb
 
         # if self.silent:
         CREATE_NO_WINDOW = 0x08000000
