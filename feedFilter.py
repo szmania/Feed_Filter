@@ -1,6 +1,9 @@
 # Created by: Curtis Szmania
 # Date: 10/1/2016
 # Initial Creation
+# 
+# Date: 5/12/2017
+# Version 0.01 release
 
 __author__='szmania'
 
@@ -18,6 +21,7 @@ import abc
 import urllib2
 from PyQt4.QtGui import *
 from PyQt4.Qt import *
+
 
 # sys.path.append('./libs')
 # from libs.pyxenforoapi import Xenforo
