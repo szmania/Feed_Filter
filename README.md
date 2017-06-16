@@ -1,3 +1,4 @@
-# Feed_Filter
+# Torrent Feed Filter
 
-Filter manager for torrent rss feeds for your most popular torrenting sites like ruTracker and tenYardTorrents.
+Torrent filter manager for torrent RSS feeds for your most popular torrenting sites like ruTracker and tenYardTorrents.
+
