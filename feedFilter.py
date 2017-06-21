@@ -483,7 +483,7 @@ class MainWindow(QMainWindow):
 
 
 
-class feedFilter(MainWindow):
+class FeedFilter(MainWindow):
     def __init__(self, **kwargs):
         MainWindow.__init__(self, **kwargs)
 
@@ -883,7 +883,7 @@ def main():
     # mw.runGUI()
 
 
-    feedFilterObj = feedFilter(**kwargs)
+    feedFilterObj = FeedFilter(**kwargs)
     # feedFilterObj.fetchTorrents()
 
 
