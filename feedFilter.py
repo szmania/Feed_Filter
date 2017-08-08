@@ -1,5 +1,5 @@
 # Created by: Curtis Szmania
-# Date: 10/1/2016
+# Date: 10/1/2014
 # Initial Creation
 # 
 # Date: 5/12/2017
@@ -18,13 +18,18 @@ import sys
 import datetime
 import argparse
 import abc
-import urllib2
-from PyQt4.QtGui import *
-from PyQt4.Qt import *
 
+from PyQt5.QtGui import *
+from PyQt5.Qt import *
+
+# Check if Python3. If so import urllib3.
+# if sys.version_info >= (3, 0):
+#     import urllib3
+# else:
+#     import urllib2
 
 # sys.path.append('./libs')
-# from libs.pyxenforoapi import Xenforo
+# from libs.pyxenforoapi import Xenforo, LoginError
 from pyxenforoapi.pyxenforo import Xenforo, LoginError
 # from libs.rutracker.rutracker import Configuration
 
@@ -126,11 +131,17 @@ class MainWindow(QMainWindow):
         self.filtersList = []
 
 
-    def runGUI(self):
+    def run_gui(self):
+        """
+        Run Feed Filter gui.
+        """
         self.filtersList = self.read_filters_file()
-        self.setUpGUI()
+        self.setup_gui()
 
-    def setUpGUI(self):
+    def setup_gui(self):
+        """
+        Setup gui.
+        """
         app = QApplication(sys.argv)
         self.cw = QWidget(self)
         self.setCentralWidget(self.cw)
@@ -144,14 +155,17 @@ class MainWindow(QMainWindow):
         self.cw.setLayout(self.cwGrid)
         # self.connect(self.btn1, SIGNAL("clicked()"), self.doit)
         self.populate()
-        self.signalsSlots()
+        self.signals_slots()
 
         self.show()
-        self.getWidgetInitialSizes()
+        self.get_widget_initial_sizes()
 
         app.exec_()
 
     def center(self):
+        """
+        Center gui window.
+        """
         frameGm = self.frameGeometry()
         screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
         centerPoint = QApplication.desktop().screenGeometry(screen).center()
@@ -159,22 +173,28 @@ class MainWindow(QMainWindow):
         self.move(frameGm.topLeft())
 
 
-    def getWidgetInitialSizes(self):
+    def get_widget_initial_sizes(self):
+        """
+        Get widget initial sizes.
+        """
         self._width = self.width()
         self._height = self.height()
 
 
-
-
-
     def populate(self):
+        """
+        Populate gui widgets.
+        """
 
-        self.populateMegaManager()
+        self.populate_mega_manager()
 
-        self.populateFeedFilter()
+        self.populate_feed_filter_gui()
 
 
-    def populateMegaManager(self):
+    def populate_mega_manager(self):
+        """
+        Populate MEGA Manager widget
+        """
         self.megaManagerWidget = QWidget(self.cw)
         self.cwGrid.addWidget(self.megaManagerWidget, 5,5)
         self.megaManagerWidget.setMinimumSize(500,1)
@@ -215,8 +235,10 @@ class MainWindow(QMainWindow):
         self.megaManagerWidget.setVisible(False)
 
 
-
-    def populateFeedFilter(self):
+    def populate_feed_filter_gui(self):
+        """
+        Populate Feed Filter gui.
+        """
         self.feedFilterWidget = QWidget(self.cw)
         self.cwGrid.addWidget(self.feedFilterWidget, 10,5)
         self.feedFilterWidget.setMinimumSize(500,1)
@@ -239,8 +261,6 @@ class MainWindow(QMainWindow):
         # self.feedFilterShowQLV_x = self.feedFilterShowQLV.x()
         # self.feedFilterShowQLV_y = self.feedFilterShowQLV.y()
 
-
-
         self.contentsLbl = QLabel('Current Feed Filters:')
         self.ffQLVGrid.addWidget(self.contentsLbl, 0, 0)
         self.contentsTxtEdit = QTextEdit()
@@ -257,8 +277,6 @@ class MainWindow(QMainWindow):
         self.ffQLVGrid.addWidget(self.urlLbl, 4, 0)
         self.urlTxt = QLineEdit()
         self.ffQLVGrid.addWidget(self.urlTxt, 4, 1, 1, 2)
-
-
 
         self.containsLbl = QLabel('Contains (delineated by ",":')
         self.ffQLVGrid.addWidget(self.containsLbl, 6, 0)
@@ -300,22 +318,27 @@ class MainWindow(QMainWindow):
         self.ffQLVGrid.addWidget(self.fetchTorrentsBtn, self.ffQLVGrid.rowCount() + 1, self.ffQLVGrid.columnCount() - 1)
 
 
-    def signalsSlots(self):
+    def signals_slots(self):
+        """
+        Signals and slots.
+        """
         self.mmAccountsFileBtn.clicked.connect(self.mega_accounts_file_select_file)
         self.mmMegaToolsBtn.clicked.connect(self.mega_tools_select_dir)
 
-        self.megaManagerShowBtn.toggled.connect(self.showMegaManager)
+        self.megaManagerShowBtn.toggled.connect(self.show_mega_manager)
 
         self.feedFilterShowBtn.toggled.connect(self.show_feed_filter)
         self.addFilterBtn.clicked.connect(self.add_filter)
-        self.rssChkBox.clicked.connect(self.typeChkBox)
-        self.htmlChkBox.clicked.connect(self.typeChkBox)
+        self.rssChkBox.clicked.connect(self.type_chk_box)
+        self.htmlChkBox.clicked.connect(self.type_chk_box)
 
         self.fetchTorrentsBtn.clicked.connect(self.fetchTorrents)
 
 
-
-    def typeChkBox(self):
+    def type_chk_box(self):
+        """
+        RSS Feed type checkbox.
+        """
         if self.rssChkBox.isChecked():
             self.htmlChkBox.setChecked(False)
 
@@ -323,7 +346,10 @@ class MainWindow(QMainWindow):
             self.rssChkBox.setChecked(False)
 
 
-    def showMegaManager(self):
+    def show_mega_manager(self):
+        """
+        Show MEGA Manager.
+        """
         # self.animation = QPropertyAnimation(self.megaManagerShowQLV, 'size')
         # self.animation.setDuration(200)
         if self.megaManagerShowBtn.isChecked():
@@ -546,7 +572,7 @@ class FeedFilter(MainWindow):
         if self.auto:
             self.run_feed_filter()
         else:
-            self.runGUI()
+            self.run_gui()
 
 
     def __exit__(self):
@@ -912,7 +938,7 @@ def getArgs():
                         help='Autorun Feed Filter fetching, without GUI.')
 
     # parser.add_argument('-s', dest='silent', action='store_true', default=False,
-    #                     help='Silent runGUI of Feed Filter (sifting). No windows.')
+    #                     help='Silent run_gui of Feed Filter (sifting). No windows.')
     #
 
 
@@ -927,7 +953,7 @@ def main():
     kwargs = getArgs()
     app = QApplication(sys.argv)
     # mw = MainWindow()
-    # mw.runGUI()
+    # mw.run_gui()
 
 
     feedFilterObj = FeedFilter(**kwargs)
