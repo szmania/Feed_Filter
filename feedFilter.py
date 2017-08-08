@@ -265,7 +265,7 @@ class MainWindow(QMainWindow):
         self.ffQLVGrid.addWidget(self.contentsLbl, 0, 0)
         self.contentsTxtEdit = QTextEdit()
         self.ffQLVGrid.addWidget(self.contentsTxtEdit, 1, 0, 1, -1)
-        self.contentsTxtEdit.setText(self.getFiltersFileText())
+        self.contentsTxtEdit.setText(self.get_filters_file_text())
         # self.contentsTxtEdit.setMinimumHeight(100)
 
         self.filterNameLbl = QLabel("Feed Filter Name:")
@@ -332,7 +332,7 @@ class MainWindow(QMainWindow):
         self.rssChkBox.clicked.connect(self.type_chk_box)
         self.htmlChkBox.clicked.connect(self.type_chk_box)
 
-        self.fetchTorrentsBtn.clicked.connect(self.fetchTorrents)
+        self.fetchTorrentsBtn.clicked.connect(self.fetch_torrents)
 
 
     def type_chk_box(self):
@@ -455,7 +455,7 @@ class MainWindow(QMainWindow):
         self.filtersList.append(filterDict)
         self.write_to_filters_file()
         self.read_filters_file()
-        self.contentsTxtEdit.setText(self.getFiltersFileText())
+        self.contentsTxtEdit.setText(self.get_filters_file_text())
 
 
     def write_to_filters_file(self, dateTime=None):
@@ -509,14 +509,23 @@ class MainWindow(QMainWindow):
 
 
 
-    def getFiltersFileText(self):
+    def get_filters_file_text(self):
+        """
+        Get Filters file text.
+
+        Returns:
+             String: text of filters file.
+        """
         with open(FILTERS_FILE, "r") as filtersFile:
             text = filtersFile.read()
 
         filtersFile.close()
         return text
 
-    def fetchTorrents(self):
+    def fetch_torrents(self):
+        """
+        Fetch torrents.
+        """
         self.run_feed_filter()
         # qMessageBox = QMessageBox()
         QMessageBox.information(self, 'Fetching done', 'Torrent fetching finished!')
@@ -527,7 +536,7 @@ class MainWindow(QMainWindow):
         pass
 
     @abc.abstractmethod
-    def getAllMegaAccountsStatus(self):
+    def get_all_mega_accounts_status(self):
         pass
 
 
@@ -653,7 +662,7 @@ class FeedFilter(MainWindow):
         """
         logging.debug(' Running feedFilter.')
 
-        self._getFeedFilters()
+        self._get_feed_filters()
         for i in range(len(self.filtersList)):
             self._process_filter(self.filtersList[i])
 
@@ -669,7 +678,7 @@ class FeedFilter(MainWindow):
         """
         logging.debug('')
         logging.debug(' Processing filter: %s' % (dict['name']))
-        feedData = self._getFeedData(dict['url'])
+        feedData = self._get_feed_data(dict['url'])
 
 
         if dict['client'] == 'Deluge':
@@ -689,7 +698,7 @@ class FeedFilter(MainWindow):
                 logging.debug('    Post title: "%s"' % posts[i].title)
                 # if dict['client'] == 'Deluge':
                 if 'rutracker' in posts[i].link:
-                    topicID = self._getTopicIDFromPostURL(posts[i].link)
+                    topicID = self._get_topic_id_from_post_url(posts[i].link)
                     self._downloadTorrent_ruTracker(topicID, downloadTorrentDir)
                     # self.addTorrentToDeluge(topicID)
 
@@ -703,13 +712,25 @@ class FeedFilter(MainWindow):
             logging.debug(' Feed filter "%s" not enabled. Skipping.' % dict['name'])
 
 
-    def _getFeedFilters(self):
+    def _get_feed_filters(self):
+        """
+        Get Feed Filters
+        """
         logging.debug(' Read feeds.')
 
         self.read_filters_file()
 
 
-    def _getFeedData(self, url):
+    def _get_feed_data(self, url):
+        """
+        Get feed data.
+
+        Args:
+            url (str): Url to get RSS feed data from.
+
+        Returns:
+             String: data gotten from feed.
+        """
         logging.debug(' Getting feed data from "%s".' % url)
 
         if 'tenyardtracker' in url:
@@ -745,6 +766,18 @@ class FeedFilter(MainWindow):
 
 
     def _filterFeed(self, data, lastChecked, contains='', excludes=''):
+        """
+        Filter feed data.
+
+        Args:
+            data (str): Data gotten from RSS feed.
+            lastChecked (str): Date and time of last checked.
+            contains (list): List of strings for what terms a feed title should contain.
+            excludes (list): List of strings for what terms a feed title should NOT contain.
+
+        Returns:
+            List: List of posts that match credentials.
+        """
         logging.debug(' Filtering data in feed which containes "%s" and excludes "%s".' % (contains, excludes))
 
         posts = []
@@ -796,7 +829,16 @@ class FeedFilter(MainWindow):
         return posts
 
 
-    def convertFeedURLToTorrentURL(self, feedURL):
+    def convert_feed_url_to_torrent_url(self, feedURL):
+        """
+        Convert Feed URL to a torrent URL.
+
+        Args:
+            feedURL (str): Feed url to fetch torrent url from.
+
+        Returns:
+            String: Torrent url.
+        """
         logging.debug(' Convert feed url to torrent url.')
 
         if 'rutracker' in feedURL:
@@ -805,7 +847,16 @@ class FeedFilter(MainWindow):
             return torrentURL
 
 
-    def _getTopicIDFromPostURL(self, feedURL):
+    def _get_topic_id_from_post_url(self, feedURL):
+        """
+        Get topic id from post url.
+
+        Args:
+            feedURL (str): Feed url to get topic id from.
+
+        Returns:
+
+        """
         logging.debug('    Get topic id from post url.')
 
         if 'rutracker' in feedURL:
@@ -957,7 +1008,7 @@ def main():
 
 
     feedFilterObj = FeedFilter(**kwargs)
-    # feedFilterObj.fetchTorrents()
+    # feedFilterObj.fetch_torrents()
 
 
 
