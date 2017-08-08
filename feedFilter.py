@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
 
 
     def runGUI(self):
-        self.filtersList = self.readFiltersFile()
+        self.filtersList = self.read_filters_file()
         self.setUpGUI()
 
     def setUpGUI(self):
@@ -301,13 +301,13 @@ class MainWindow(QMainWindow):
 
 
     def signalsSlots(self):
-        self.mmAccountsFileBtn.clicked.connect(self.megaAccountsFile_selectFile)
-        self.mmMegaToolsBtn.clicked.connect(self.megaTools_selectDir)
+        self.mmAccountsFileBtn.clicked.connect(self.mega_accounts_file_select_file)
+        self.mmMegaToolsBtn.clicked.connect(self.mega_tools_select_dir)
 
         self.megaManagerShowBtn.toggled.connect(self.showMegaManager)
 
-        self.feedFilterShowBtn.toggled.connect(self.showFeedFilter)
-        self.addFilterBtn.clicked.connect(self.addFilter)
+        self.feedFilterShowBtn.toggled.connect(self.show_feed_filter)
+        self.addFilterBtn.clicked.connect(self.add_filter)
         self.rssChkBox.clicked.connect(self.typeChkBox)
         self.htmlChkBox.clicked.connect(self.typeChkBox)
 
@@ -345,7 +345,10 @@ class MainWindow(QMainWindow):
         # self.adjustSize()
 
 
-    def showFeedFilter(self):
+    def show_feed_filter(self):
+        """
+        Show Feed Filter gui.
+        """
 
         # self.animationff = QPropertyAnimation(self.feedFilterShowQLV, 'visible')
         # self.animationff.setDuration(200)
@@ -378,16 +381,25 @@ class MainWindow(QMainWindow):
         # self.adjustSize()
 
 
-    def megaAccountsFile_selectFile(self):
+    def mega_accounts_file_select_file(self):
+        """
+        MEGA accounts file, select file.
+        """
         self.mmAccountsFileTxt.setText(QFileDialog.getOpenFileName(filter="Text file (*.txt)"))
 
-    def megaTools_selectDir(self):
+    def mega_tools_select_dir(self):
+        """
+        Select directory for MEGA tools api location.
+        """
         self.mmMegaToolsTxt.setText(QFileDialog.getExistingDirectory(options=QFileDialog.ShowDirsOnly))
         for item in MEGATOOLS_EXEs:
             if not os.path.isfile(self.mmMegaToolsTxt.text()+ '\%s.exe' % item):
                 QMessageBox.warning(self, 'MegaTools executable not found!', '"%s" not found!' % item)
 
-    def addFilter(self):
+    def add_filter(self):
+        """
+        Add filter.
+        """
         filterDict = {}
         filterDict['name'] = self.filterNameTxt.text()
         filterDict['url'] = self.urlTxt.text()
@@ -415,12 +427,19 @@ class MainWindow(QMainWindow):
 
 
         self.filtersList.append(filterDict)
-        self.writeToFiltersFile()
-        self.readFiltersFile()
+        self.write_to_filters_file()
+        self.read_filters_file()
         self.contentsTxtEdit.setText(self.getFiltersFileText())
 
 
-    def writeToFiltersFile(self, dateTime=None):
+    def write_to_filters_file(self, dateTime=None):
+        """
+        Write to filters file.
+
+        Args:
+            dateTime (str): Date time as string for setting last check date.
+        """
+
         with open(FILTERS_FILE, "w") as filtersFile:
 
             for i in range(len(self.filtersList)):
@@ -442,7 +461,11 @@ class MainWindow(QMainWindow):
 
         filtersFile.close()
 
-    def readFiltersFile(self):
+
+    def read_filters_file(self):
+        """
+        Read filters file.
+        """
         self.filtersList = []
         with open(FILTERS_FILE, "r") as filtersFile:
             dict = {}
@@ -468,13 +491,13 @@ class MainWindow(QMainWindow):
         return text
 
     def fetchTorrents(self):
-        self.runFeedFilter()
+        self.run_feed_filter()
         # qMessageBox = QMessageBox()
         QMessageBox.information(self, 'Fetching done', 'Torrent fetching finished!')
 
 
     @abc.abstractmethod
-    def runFeedFilter(self):
+    def run_feed_filter(self):
         pass
 
     @abc.abstractmethod
@@ -485,10 +508,13 @@ class MainWindow(QMainWindow):
 
 class FeedFilter(MainWindow):
     def __init__(self, **kwargs):
+        """
+        Feed Filter sifts through peer-to-peer file sharing RSS feeds to find torrent files.
+        """
         MainWindow.__init__(self, **kwargs)
 
 
-        self._setUpLog()
+        self._setup_log()
 
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -498,34 +524,44 @@ class FeedFilter(MainWindow):
         logging.debug('')
 
 
-        self._setUp()
+        self._setup()
 
 
-    def _setUp(self):
+    def _setup(self):
+        """
+        Feed Filter setup.
+        """
 
         logging.debug(' Setting up feedFilter.')
 
 
-        self.getTorrentClientsInfo()
+        self.get_torrent_clients_info()
 
         if (not self.ruTracker_username or self.ruTracker_password) \
                 and (not self.tyt_username or self.tyt_password)\
                 and (not self.tyt_forums_username or self.tyt_forums_password):
 
-            self.getLoginInfo()
+            self.get_accounts_info()
 
         if self.auto:
-            self.runFeedFilter()
+            self.run_feed_filter()
         else:
             self.runGUI()
 
 
     def __exit__(self):
-        logging.debug(' ENTERING DECONSTRUCTOR!!!')
-        self.writeToFiltersFile()
-        # self._tearDownLog()
+        """
+        Feed Filter "deconstructor".
+        """
 
-    def _setUpLog(self):
+        logging.debug(' ENTERING DECONSTRUCTOR!!!')
+        self.write_to_filters_file()
+        # self._teardown_log()
+
+    def _setup_log(self):
+        """
+        Set up logging.
+        """
         
         logging.basicConfig(filename=LOGFILE_feedFilter, level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
@@ -535,13 +571,19 @@ class FeedFilter(MainWindow):
         # log.close()
 
 
-    def _tearDownLog(self):
+    def _teardown_log(self):
+        """
+        Tear down logging.
+        """
         with open("feedFilter_log.log", "a") as log:
             log.write(str(datetime.datetime.now()) +"\n")
         log.close()
 
 
-    def getTorrentClientsInfo(self):
+    def get_torrent_clients_info(self):
+        """
+        Get torrent client's information.
+        """
         logging.debug(' Getting torrent client info from torrentClients.cfg file.')
 
         with open(TORRENT_CLIENTS_FILE, 'r') as cfg:
@@ -555,11 +597,10 @@ class FeedFilter(MainWindow):
                 self.vuze_download_torrent_folder = re.sub('torrentDownloadDir=', '', lines[i+1]).rstrip('\r\n')
 
 
-
-        
-
-
-    def getLoginInfo(self):
+    def get_accounts_info(self):
+        """
+        Get peer-to-peer account information from accounts.cfg
+        """
         logging.debug(' Getting accounts info from accounts.cfg file.')
 
         with open(ACCOUNTS_FILE, 'r') as cfg:
@@ -580,18 +621,26 @@ class FeedFilter(MainWindow):
                 self.tyt_forums_password = re.sub('password=', '', lines[i+2]).rstrip('\r\n')
 
 
-
-    def runFeedFilter(self):
+    def run_feed_filter(self):
+        """
+        Run Feed Filter.
+        """
         logging.debug(' Running feedFilter.')
 
         self._getFeedFilters()
         for i in range(len(self.filtersList)):
-            self._processFilter(self.filtersList[i])
+            self._process_filter(self.filtersList[i])
 
-        self.writeToFiltersFile(dateTime=datetime.datetime.now())
+        self.write_to_filters_file(dateTime=datetime.datetime.now())
 
 
-    def _processFilter(self, dict):
+    def _process_filter(self, dict):
+        """
+        Process filter.
+
+        Args:
+            dict (dict): dictionary
+        """
         logging.debug('')
         logging.debug(' Processing filter: %s' % (dict['name']))
         feedData = self._getFeedData(dict['url'])
@@ -628,12 +677,10 @@ class FeedFilter(MainWindow):
             logging.debug(' Feed filter "%s" not enabled. Skipping.' % dict['name'])
 
 
-
-
     def _getFeedFilters(self):
         logging.debug(' Read feeds.')
 
-        self.readFiltersFile()
+        self.read_filters_file()
 
 
     def _getFeedData(self, url):
