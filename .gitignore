@@ -89,8 +89,11 @@ ENV/
 .ropeproject
 
 # szmania
-libs/
-*.log
-cookies.txt
 data/
+*.log
 .idea/
+cookies.txt
+libs/
+
+
+

@@ -1,7 +1,7 @@
 # Created by: Curtis Szmania
 # Date: 10/1/2014
 # Initial Creation
-# 
+#
 # Date: 5/12/2017
 # Version 0.01 release
 
@@ -19,8 +19,14 @@ import datetime
 import argparse
 import abc
 
-from PyQt4.QtGui import *
-from PyQt4.Qt import *
+from PyQt5.QtGui import *
+from PyQt5.Qt import *
+
+# Check if Python3. If so import urllib3.
+# if sys.version_info >= (3, 0):
+#     import urllib3
+# else:
+#     import urllib2
 
 # Check if Python3. If so import urllib3.
 # if sys.version_info >= (3, 0):
@@ -479,7 +485,7 @@ class MainWindow(QMainWindow):
 
                 if dateTime and dict['enabled'] == 'True':
                     filtersFile.write('lastChecked='+ str(dateTime) +'\n')
-                else: 
+                else:
                     filtersFile.write('lastChecked='+ dict['lastChecked'] +'\n')
 
                 filtersFile.write('==========================================\n')
@@ -596,7 +602,7 @@ class FeedFilter(MainWindow):
         """
         Set up logging.
         """
-        
+
         logging.basicConfig(filename=LOGFILE_feedFilter, level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
 
