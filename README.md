@@ -1,1 +1,4 @@
-# Feed_Filter
+# Feed Filter
+
+RSS feed filter and manager.
+
